@@ -19,7 +19,7 @@ public class Vocab {
 	private String word;
 	
 	@NotBlank
-	@Size(max=255)
+	@Size(max=230)
 	private String meaning;
 	
 	private VocabType vocabType;
