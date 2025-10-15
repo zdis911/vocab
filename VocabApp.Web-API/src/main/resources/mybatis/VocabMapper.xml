@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.mapper.VocabMapper">
+
+	<resultMap id="joinMap" type="Vocab" autoMapping="true">
+		<association property="vocabType" javaType="VocabType">
+			<id property="id" column="type_id" />
+			<result property="name" column="type_name" />
+		</association>	
+	</resultMap>
+	
+	<sql id="baseSelect">
+		SELECT
+			v.id,v.word,v.meaning,
+			v.registered_at,v.updated_at,
+			vt.id AS type_id,vt.name AS type_name
+		FROM vocabs AS v
+		JOIN vocab_types AS vt
+		ON v.type_id=vt.id
+	</sql>
+	<select id="selectAll" resultMap="joinMap">
+		<include refid="baseSelect" />
+	</select>
+	<select id="selectById" resultMap="joinMap" parameterType="int">
+		<include refid="baseSelect" />
+		WHERE v.id=#{id}
+	</select>
+	<select id="selectByType" resultMap="joinMap" parameterType="int">
+		<include refid="baseSelect" />
+		WHERE v.type_id=#{typeId}
+	</select>
+	<select id="selectAllTypes" resultType="vocabType">
+		SELECT * FROM vocab_types
+		ORDER BY id
+	</select>
+	<insert id="insert" parameterType="Vocab">
+		INSERT INTO vocabs
+		(word,meaning,type_id,registered_at,updated_at)
+		VALUES (#{word},#{meaning},#{vocabType.id},NOW(),NOW())
+	</insert>
+	<update id="update" parameterType="Vocab">
+		UPDATE vocabs
+		SET word=#{word},meaning=#{meaning},
+		type_id=#{vocabType.id},updated_at=NOW()
+		WHERE id=#{id}
+	</update>
+	<delete id="delete" parameterType="int">
+		DELETE FROM vocabs WHERE id=#{id}
+	</delete>
+</mapper>
